@@ -373,7 +373,7 @@ export interface ApiApplicationApplication extends Struct.CollectionTypeSchema {
   collectionName: 'applications';
   info: {
     description: '';
-    displayName: 'application';
+    displayName: 'applicant';
     pluralName: 'applications';
     singularName: 'application';
   };
@@ -382,22 +382,25 @@ export interface ApiApplicationApplication extends Struct.CollectionTypeSchema {
   };
   attributes: {
     aadhaar: Schema.Attribute.String;
-    application_status: Schema.Attribute.Enumeration<
-      ['submitted', 'approved', 'rejected']
-    > &
+    application_date: Schema.Attribute.Date;
+    application_status: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'submitted'>;
-    benefit: Schema.Attribute.Relation<'manyToOne', 'api::benefit.benefit'>;
-    caste: Schema.Attribute.Enumeration<
-      ['SC', 'ST', 'OBC', 'General', 'Other']
+    benefit: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::scholarship.scholarship'
     >;
+    caste: Schema.Attribute.String;
     class: Schema.Attribute.Integer;
-    content_id: Schema.Attribute.String;
+    content_id: Schema.Attribute.Integer;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    current_school_address: Schema.Attribute.Text;
+    current_school_name: Schema.Attribute.Text;
     email: Schema.Attribute.Email;
+    father_name: Schema.Attribute.String;
     first_name: Schema.Attribute.String;
-    gender: Schema.Attribute.Enumeration<['male', 'female', 'other']>;
+    gender: Schema.Attribute.String;
     last_name: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -409,9 +412,8 @@ export interface ApiApplicationApplication extends Struct.CollectionTypeSchema {
     order_id: Schema.Attribute.String;
     phone: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    resident_type: Schema.Attribute.Enumeration<
-      ['Hosteller', 'Dayscholar', 'Other']
-    >;
+    resident_type: Schema.Attribute.String;
+    samagra_id: Schema.Attribute.String;
     submission_id: Schema.Attribute.String;
     transaction_id: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -420,61 +422,11 @@ export interface ApiApplicationApplication extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface ApiBenefitBenefit extends Struct.CollectionTypeSchema {
-  collectionName: 'benefits';
-  info: {
-    description: '';
-    displayName: 'Benefit';
-    pluralName: 'benefits';
-    singularName: 'benefit';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    application_deadline: Schema.Attribute.Date;
-    applications: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::application.application'
-    >;
-    auto_renewal: Schema.Attribute.Boolean;
-    budget: Schema.Attribute.Decimal;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    currency: Schema.Attribute.String;
-    description: Schema.Attribute.Text;
-    eligibility: Schema.Attribute.Component<
-      'composite-attributes.eligibility',
-      false
-    >;
-    extended_deadline: Schema.Attribute.Date;
-    financial_information: Schema.Attribute.Component<
-      'composite-attributes.financial-information',
-      false
-    >;
-    is_published: Schema.Attribute.Boolean;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::benefit.benefit'
-    > &
-      Schema.Attribute.Private;
-    long_description: Schema.Attribute.Text;
-    name: Schema.Attribute.String & Schema.Attribute.Unique;
-    publishedAt: Schema.Attribute.DateTime;
-    sponsors: Schema.Attribute.Component<'composite-attributes.sponsors', true>;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    valid_till: Schema.Attribute.Date;
-  };
-}
-
 export interface ApiOtpOtp extends Struct.CollectionTypeSchema {
   collectionName: 'otps';
   info: {
-    displayName: 'Otp';
+    description: '';
+    displayName: 'otp';
     pluralName: 'otps';
     singularName: 'otp';
   };
@@ -482,6 +434,7 @@ export interface ApiOtpOtp extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    ABCD: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -496,6 +449,61 @@ export interface ApiOtpOtp extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiScholarshipScholarship extends Struct.CollectionTypeSchema {
+  collectionName: 'scholarships';
+  info: {
+    description: '';
+    displayName: 'benefit';
+    pluralName: 'scholarships';
+    singularName: 'scholarship';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    applicants: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::application.application'
+    >;
+    application_deadline: Schema.Attribute.Date;
+    auto_renewal: Schema.Attribute.Boolean;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    currency: Schema.Attribute.String;
+    description: Schema.Attribute.Text;
+    eligibility: Schema.Attribute.Component<
+      'composite-attributes.eligibility',
+      false
+    >;
+    extended_deadline: Schema.Attribute.Date;
+    financial_information: Schema.Attribute.Component<
+      'composite-attributes.financial-information',
+      false
+    >;
+    is_published: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::scholarship.scholarship'
+    > &
+      Schema.Attribute.Private;
+    long_description: Schema.Attribute.Text;
+    name: Schema.Attribute.String;
+    price: Schema.Attribute.Decimal;
+    provider: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    sponsors: Schema.Attribute.Component<'composite-attributes.sponsor', true>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    valid_till: Schema.Attribute.Date;
   };
 }
 
@@ -950,9 +958,12 @@ export interface PluginUsersPermissionsUser
   };
   options: {
     draftAndPublish: false;
-    timestamps: true;
   };
   attributes: {
+    benefits: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::scholarship.scholarship'
+    >;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     confirmationToken: Schema.Attribute.String & Schema.Attribute.Private;
     confirmed: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -1005,8 +1016,8 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::application.application': ApiApplicationApplication;
-      'api::benefit.benefit': ApiBenefitBenefit;
       'api::otp.otp': ApiOtpOtp;
+      'api::scholarship.scholarship': ApiScholarshipScholarship;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
